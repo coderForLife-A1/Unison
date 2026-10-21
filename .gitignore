@@ -1,0 +1,55 @@
+#Environment & Configuration
+
+.env
+.env.local
+*.env
+config.local.json
+
+#Python / Local Engine
+
+pycache/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+
+#Local Vector Storage & DBs
+
+*.db
+*.sqlite
+*.sqlite3
+/data/
+/lancedb/
+/vector_store/
+
+#Local Models & Quantized Files
+
+*.gguf
+*.bin
+/models/
+
+#Application Logs & Temp Files
+
+*.log
+logs/
+.tmp/
+temp/
+
+#Node.js / Frontend (Tauri/Streamlit/React UI)
+
+node_modules/
+.next/
+out/
+dist/
+build/
+.svelte-kit/
+
+#OS Specific
+
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
