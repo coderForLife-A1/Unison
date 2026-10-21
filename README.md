@@ -16,13 +16,13 @@ Core Highlights
 
 Intelligent Deduplication: Merges multi-message chat floods into coherent single-thread digests using semantic vector similarity.
 
-Structured Triage: Powered by local inference, messages are classified strictly into Action Items, Social Summaries, and Low-Priority Noise.
+Structured Unison: Powered by local inference, messages are classified strictly into Action Items, Social Summaries, and Low-Priority Noise.
 
 Zero-Cloud Dependency: Designed to run seamlessly offline on standard laptop hardware.
 
 🏗️ Architecture
 
-Unison uses a modular ingestion-to-triage pipeline executing entirely on local device runtime:
+Unison uses a modular ingestion-to-unison pipeline executing entirely on local device runtime:
 
 ┌─────────────────────────────────────────────────────────────────┐
 │                       Ingestion Sources                         │
@@ -45,7 +45,7 @@ Unison uses a modular ingestion-to-triage pipeline executing entirely on local d
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                 Local LLM Structured Triage                     │
+│                 Local LLM Structured Unison                     │
 │               Ollama (Qwen2.5-3B-Instruct)                      │
 │    Structured JSON schema via Instructor / Pydantic parsing     │
 └──────────────────────────────┬──────────────────────────────────┘
@@ -130,7 +130,7 @@ Ingest: Background adapters monitor local notification hooks, email IMAP servers
 
 Deduplicate: FastEmbed generates local embeddings for incoming alerts, comparing them against recent entries in LanceDB to merge related chat messages.
 
-Triage: The local Qwen2.5-3B model processes the batch using Instructor to enforce structured JSON output:
+Unison: The local Qwen2.5-3B model processes the batch using Instructor to enforce structured JSON output:
 
 {
   "source": "WhatsApp - Family Group",

@@ -1,0 +1,24 @@
+# Unison — Local-first notification intelligence
+# Python >= 3.10 required
+
+# Local LLM inference
+ollama>=0.4.0
+instructor>=1.7.0
+
+# Embeddings & Vector DB
+fastembed>=0.4.0
+lancedb>=0.15.0
+
+# Data models & validation
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# Dashboard UI
+streamlit>=1.38.0
+
+# Async support
+aiofiles>=24.0.0
+
