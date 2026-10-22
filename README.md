@@ -1,159 +1,201 @@
-🦥 Unison
+# 🦥 Unison
 
-Slow and Steady Notification Intelligence.
+> **Slow and Steady Notification Intelligence.**  
+> A private, local-first communication aggregator, semantic deduplicator, and AI digest engine. Built for quiet minds and zero-distraction focus.
 
-A local-first notification, SMS, WhatsApp, and email aggregation and summarization dashboard. Built for the "Slow and Steady" hackathon, Unison brings all your communication channels into a single, quiet interface powered by local open-weight LLMs.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.160+-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Ollama](https://img.shields.io/badge/Ollama-Offline%20Inference-black?logo=ollama&logoColor=white)](https://ollama.com)
+[![LanceDB](https://img.shields.io/badge/LanceDB-Vector%20Store-EC5A3D)](https://lancedb.com)
+[![Zero Cloud](https://img.shields.io/badge/Privacy-100%25%20Air--Gapped-success)](#-privacy--security-guarantees)
 
-📸 Overview
+---
 
-Modern digital communication forces us to constantly context-switch across dozens of messaging platforms, email inboxes, and system popups. This creates notification fatigue, fragmented attention, and unnecessary stress.
+## 📸 Overview
 
-Unison flips this dynamic on its head. Instead of reacting to endless pings, Unison passively ingests alerts from your platforms, deduplicates repeated chatter using local vector storage, and runs structured local inference to categorize messages into a clean, actionable digest.
+Modern digital communication forces us to constantly context-switch across dozens of messaging platforms, email inboxes, and system popups. This creates notification fatigue, fragmented attention, and chronic cognitive overload.
 
-Core Highlights
+**Unison flips this dynamic on its head.** Instead of reacting to endless real-time pings:
+1. **Passively Ingests** alerts from WhatsApp, Android SMS, emails, and system feeds.
+2. **Semantically Deduplicates** floods of incoming chatter using local vector embeddings.
+3. **Triages & Summarizes** messages into clean, actionable digests using offline local LLMs.
+4. **Presents a Unified Dashboard** accessible seamlessly across both **Desktop** and **Android devices**.
 
-100% Local & Air-Gapped: Your notifications, SMS logs, and private email bodies never leave your machine.
+---
 
-Intelligent Deduplication: Merges multi-message chat floods into coherent single-thread digests using semantic vector similarity.
+## ✨ Key Features
 
-Structured Unison: Powered by local inference, messages are classified strictly into Action Items, Social Summaries, and Low-Priority Noise.
+- 🔒 **100% Local & Air-Gapped:** Zero telemetry, zero cloud API calls. Notification bodies, credentials, and contacts never leave your device.
+- 🧬 **Intelligent Vector Deduplication:** High-frequency chat floods (e.g. 15 messages in 2 minutes) are collapsed into single coherent conversation digests via cosine similarity.
+- 🦥 **Sloth Mode (Action-First Digest):** Hide informational noise and view strictly what requires your active response or decision.
+- 💬 **Suggested Quick Drafts:** AI drafts one-click response suggestions for actionable notifications.
+- 📱 **Cross-Platform Responsive (Desktop & Android):** Modern React SPA with PWA support, optimized for desktop monitors, Android mobile browsers, and native WebViews.
+- ⚡ **Debounced Batch Processing:** LLM inference is triggered conservatively in batches rather than on every raw event, maximizing battery life and reducing CPU/GPU overhead.
 
-Zero-Cloud Dependency: Designed to run seamlessly offline on standard laptop hardware.
+---
 
-🏗️ Architecture
+## 🏗️ Architecture
 
-Unison uses a modular ingestion-to-unison pipeline executing entirely on local device runtime:
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                             Ingestion Sources                               │
+│       [ OS Alerts ]    [ Android SMS ]    [ WhatsApp ]    [ IMAP Email ]    │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Pluggable Ingestion Adapters                       │
+│    Normalizes heterogeneous payloads into IngestedNotification Pydantic schemas │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Local Deduplication Engine                          │
+│          FastEmbed (bge-small-en-v1.5) + LanceDB Embedded Storage           │
+│        Groups semantically similar messages within dynamic time windows     │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Local LLM Structured Engine                         │
+│               Ollama (Qwen2.5:3b / Qwen2.5-Coder / Llama3.2)                │
+│             Structured extraction via Instructor + Pydantic v2              │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                 Unison Unified Dashboard (Desktop & Android)                │
+│         FastAPI Backend + React / HTML5 / CSS PWA (Local LAN Hosted)        │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
-┌─────────────────────────────────────────────────────────────────┐
-│                       Ingestion Sources                         │
-│   [ OS Alerts ]    [ Android SMS ]   [ WhatsApp ]   [ IMAP ]    │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Local Ingestion Adapter                      │
-│        Normalizes heterogenous message payloads to standard     │
-│                         JSON format                             │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  Local Deduplication Engine                     │
-│      FastEmbed (bge-small-en-v1.5) + LanceDB Local Storage      │
-│      Groups related chatter into unified conversation blocks    │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                 Local LLM Structured Unison                     │
-│               Ollama (Qwen2.5-3B-Instruct)                      │
-│    Structured JSON schema via Instructor / Pydantic parsing     │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   Unison Unified Dashboard                      │
-│        Single-page UI displaying Action Items & Digests         │
-└─────────────────────────────────────────────────────────────────┘
+---
 
+## 🛠️ Tech Stack & Open Source Stack
 
-🛠️ Tech Stack & Open Source Components
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Local LLM Engine** | [Ollama](https://ollama.com) (`qwen2.5:3b`, `llama3.2:3b`, etc.) | Fully offline local inference |
+| **Type-Safe Extraction** | [Instructor](https://github.com/jxnl/instructor) + [Pydantic v2](https://pydantic.dev) | Guarantees strict JSON output schema |
+| **Embeddings** | [FastEmbed](https://github.com/qdrant/fastembed) (`BAAI/bge-small-en-v1.5`) | CPU-accelerated local text embeddings |
+| **Vector Storage** | [LanceDB](https://lancedb.com) (`.lancedb/`) | Serverless, disk-based vector similarity search |
+| **Backend API** | [FastAPI](https://fastapi.tiangolo.com) + [Uvicorn](https://www.uvicorn.org) | Async REST API & static asset delivery |
+| **Frontend UI** | [React](https://react.dev) + [Vite](https://vite.dev) + Lucide Icons | Responsive Desktop & Android PWA dashboard |
 
-Local LLM Engine: Ollama running Qwen2.5-3B-Instruct (or Llama-3.2-3B-Instruct).
+---
 
-Embeddings & Vector Database: FastEmbed (bge-small-en-v1.5) paired with LanceDB for fast local vector lookups.
+## 🚀 Getting Started
 
-Structured Output Enforcement: Instructor + Pydantic to guarantee strict JSON output schemas.
+### Prerequisites
 
-User Interface: Streamlit / Tauri + React.
+1. **Python 3.10+**
+2. **Node.js 18+** & `npm`
+3. **[Ollama](https://ollama.com)** installed and running locally.
+4. Pull your preferred lightweight model:
+   ```bash
+   ollama pull qwen2.5:3b
+   ```
 
-Data Adapters: Local IMAP polling client, Android NotificationListenerService bridge.
+---
 
-✨ Features
+### Installation
 
-Unified Inbox: View SMS, WhatsApp, email, and system alerts in one consolidated interface.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/coderForLife-A1/Unison.git
+   cd Unison
+   ```
 
-Sloth Mode (Action-First Digest): Hide raw message body noise and display only explicit actions required of you.
+2. **Set up a Python virtual environment:**
+   ```bash
+   python -m venv venv
+   # On Windows:
+   venv\Scripts\activate
+   # On macOS/Linux:
+   source venv/bin/activate
+   ```
 
-Noise Reduction Filters: Automatically demotes promotional emails, verification OTPs, and system warnings to low-priority background logs.
+3. **Install Python dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Thread Consolidation: If a group chat fires 15 notifications in 2 minutes, Unison collapses them into a single 1-sentence narrative summary.
+4. **Install & build Frontend assets:**
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   cd ..
+   ```
 
-Privacy Assurance: Fully functioning with internet connection disabled (once models are downloaded).
+5. **Configure environment settings:**
+   ```bash
+   cp .env.example .env
+   ```
+   *(Review `.env` to customize model names, vector thresholds, or optional IMAP mailbox credentials)*.
 
-🚀 Getting Started
+---
 
-Prerequisites
+### Running Unison
 
-Install Python 3.10+.
-
-Install Ollama.
-
-Pull the default lightweight open-weight model:
-
-ollama pull qwen2.5:3b
-
-
-Installation
-
-Clone the repository:
-
-git clone https://github.com/coderForLife-A1/Unison.git
-cd Unison
-
-
-Set up a virtual environment:
-
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-
-Install dependencies:
-
-pip install -r requirements.txt
-
-
-Configuration:
-Create your local configuration file from the provided example:
-
-cp .env.example .env
-
-
-Run Unison:
-
+#### 1. Interactive Dashboard (Desktop & Mobile)
+```bash
 python main.py
+```
+- **Desktop:** Open [http://localhost:8000](http://localhost:8000)
+- **Android Phone (Same Wi-Fi):** Open `http://<YOUR_COMPUTER_IP>:8000`  
+  *(Tip: Tap **"Add to Home screen"** in Chrome on Android for the full native app experience).*
 
+#### 2. Headless CLI Mode
+Run a one-shot ingestion, deduplication, and triage cycle directly in the terminal:
+```bash
+python main.py --cli
+```
 
-⚙️ How It Works
+---
 
-Ingest: Background adapters monitor local notification hooks, email IMAP servers, or Android bridge outputs.
+## 📱 Mobile Integration (Android)
 
-Deduplicate: FastEmbed generates local embeddings for incoming alerts, comparing them against recent entries in LanceDB to merge related chat messages.
+Unison includes a native REST endpoint for direct alert forwarding:
 
-Unison: The local Qwen2.5-3B model processes the batch using Instructor to enforce structured JSON output:
+```http
+POST /api/notifications/direct
+Content-Type: application/json
 
 {
-  "source": "WhatsApp - Family Group",
-  "priority": "High",
-  "category": "Social",
-  "summary": "Mom and Dad are planning Sunday lunch at 1 PM.",
-  "action_required": true,
-  "action_item": "Confirm attendance by Saturday evening."
+  "source": "WhatsApp",
+  "sender": "Lead Engineer",
+  "content": "Can you review PR #42 before today's deployment?"
 }
+```
 
+- **Automation:** Use apps like **Tasker**, **MacroDroid**, or an Android **`NotificationListenerService`** to forward incoming notifications to `http://<YOUR_LAN_IP>:8000/api/notifications/direct`.
+- **Simulator:** You can test real-time mobile push notifications directly within the dashboard using the built-in **"Simulate Mobile Alert"** tool.
 
-Display: Unison renders the parsed results onto the unified local dashboard sorted by priority.
+---
 
-🛡️ Privacy & Security Guarantees
+## 🧪 Testing
 
-Unison was designed from the ground up to respect user data sovereignty:
+Run the automated test suite:
+```bash
+pytest tests
+```
 
-No Telemetry: No analytical data, message logs, or usage statistics are transmitted outside your local machine.
+---
 
-Air-Gapped Processing: Inference and vector indexing run entirely on your CPU/GPU hardware.
+## 🛡️ Privacy & Security Guarantees
 
-Local Storage: Vector databases and sqlite caches remain encrypted/stored strictly in your project workspace directory.
+- **No Remote Telemetry:** No usage metrics or message traces leave your machine.
+- **Air-Gapped Ready:** After initial dependency & model downloads, Unison operates with zero network connectivity.
+- **Embedded Storage:** LanceDB and caches remain in your local repository folder (`.lancedb/`).
 
-📜 License
+---
 
-Distributed under the MIT License. See LICENSE for details.
+## 📜 License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.
+## 📜 License
+
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.
