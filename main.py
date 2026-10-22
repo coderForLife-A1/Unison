@@ -2,7 +2,7 @@
 
 Entry point that bootstraps the application.
 Supports two modes:
-  • Dashboard  — launches the Streamlit UI  (default)
+  • Dashboard  — launches the FastAPI backend serving the React UI (default)
   • CLI        — runs a single ingest-and-unison cycle in the terminal
 """
 
@@ -31,33 +31,31 @@ def _check_ollama() -> bool:
 
 
 def run_dashboard() -> None:
-    """Launch the Streamlit dashboard via subprocess."""
-    import subprocess
+    """Launch the Unison server serving the responsive React frontend."""
+    import uvicorn
 
-    print("🦥 Starting Unison Dashboard …")
+    print("🦥 Starting Unison Server and React Dashboard at http://0.0.0.0:8000 ...")
+    print("📱 Desktop & Android devices on your local network can connect directly to http://<YOUR_IP>:8000")
 
     if not _check_ollama():
         print(
             "\n⚠️  Ollama is not running!\n"
             "   Please start it with:  ollama serve\n"
             "   Then re-run Unison.\n"
-            "   (The dashboard will still open, but unison will be disabled.)\n"
+            "   (The dashboard will still open, but AI summaries will be offline.)\n"
         )
 
-    subprocess.run(
-        [sys.executable, "-m", "streamlit", "run", "app.py", "--server.headless=true"],
-        check=False,
-    )
+    uvicorn.run("src.api:app", host="0.0.0.0", port=8000, reload=False)
 
 
 async def run_cli_cycle() -> None:
     """Run a single ingest → dedup → unison cycle in the terminal."""
-    from src.ingestion import MockAdapter
-    from src.storage.embedder import EmbeddingService
-    from src.storage.vector_store import VectorStore
-    from src.storage.deduplicator import Deduplicator
     from src.engine.llm_client import OllamaClient
     from src.engine.unison import UnisonEngine
+    from src.ingestion import MockAdapter
+    from src.storage.deduplicator import Deduplicator
+    from src.storage.embedder import EmbeddingService
+    from src.storage.vector_store import VectorStore
 
     print("🦥 Unison — CLI unison cycle\n")
 
@@ -73,7 +71,7 @@ async def run_cli_cycle() -> None:
     batches = dedup.process(notifications)
     print(f"🔗 Deduplicated into {len(batches)} batches\n")
 
-    # 3. Unison
+    # 3. Unison (Triage)
     llm = OllamaClient()
     if not llm.is_available():
         print("⚠️  Ollama is offline — skipping unison.")
@@ -115,4 +113,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

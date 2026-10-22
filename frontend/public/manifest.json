@@ -1,0 +1,17 @@
+{
+  "short_name": "Unison",
+  "name": "Unison — Local Notification Intelligence",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "display": "standalone",
+  "orientation": "portrait-primary"
+}
+
