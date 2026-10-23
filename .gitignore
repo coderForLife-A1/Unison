@@ -1,55 +1,98 @@
-#Environment & Configuration
-
+# ═════════════════════════════════════════════════════════════════════
+# Environment & Configuration (Secrets / Credentials)
+# ═════════════════════════════════════════════════════════════════════
 .env
-.env.local
+.env.*
 *.env
+*.env.local
 config.local.json
 
-#Python / Local Engine
-
-pycache/
+# ═════════════════════════════════════════════════════════════════════
+# Python & Virtual Environments
+# ═════════════════════════════════════════════════════════════════════
+__pycache__/
 *.py[cod]
 *$py.class
+*.so
 .venv/
 venv/
 ENV/
 env/
 .pytest_cache/
+.coverage
+htmlcov/
 
-#Local Vector Storage & DBs
-
+# ═════════════════════════════════════════════════════════════════════
+# Local Vector Storage, Embeddings & DB Files
+# ═════════════════════════════════════════════════════════════════════
 *.db
 *.sqlite
 *.sqlite3
+data/
 /data/
+.lancedb/
+lancedb/
 /lancedb/
+vector_store/
 /vector_store/
 
-#Local Models & Quantized Files
-
+# ═════════════════════════════════════════════════════════════════════
+# Local Machine Learning Models & Quantized Binaries
+# ═════════════════════════════════════════════════════════════════════
 *.gguf
 *.bin
+*.task
+*.tflite
+*.onnx
+models/
 /models/
 
-#Application Logs & Temp Files
-
+# ═════════════════════════════════════════════════════════════════════
+# Application Logs, Dumps & Temp Files
+# ═════════════════════════════════════════════════════════════════════
 *.log
 logs/
 .tmp/
 temp/
 
-#Node.js / Frontend (Tauri/Streamlit/React UI)
-
+# ═════════════════════════════════════════════════════════════════════
+# Node.js / Frontend (React / Vite)
+# ═════════════════════════════════════════════════════════════════════
 node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
 .next/
 out/
-dist/
-build/
 .svelte-kit/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-#OS Specific
+# ═════════════════════════════════════════════════════════════════════
+# Android Build Outputs & Gradle Caches
+# ═════════════════════════════════════════════════════════════════════
+.gradle/
+**/.gradle/
+build/
+**/build/
+*.apk
+*.aab
+*.ap_
+local.properties
+.cxx/
+captures/
+output.json
 
+# ═════════════════════════════════════════════════════════════════════
+# IDEs & OS Specific Metadata
+# ═════════════════════════════════════════════════════════════════════
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
+*.iml
+*.swp
+*.swo
