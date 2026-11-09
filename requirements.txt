@@ -22,3 +22,5 @@ streamlit>=1.38.0
 # Async support
 aiofiles>=24.0.0
 
+# Benchmark CPU/RAM measurements
+psutil>=6.0.0

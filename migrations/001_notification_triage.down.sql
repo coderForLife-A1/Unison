@@ -1,0 +1,13 @@
+PRAGMA foreign_keys = ON;
+BEGIN;
+DROP TABLE IF EXISTS thread_members;
+DROP TABLE IF EXISTS notification_threads;
+DROP TABLE IF EXISTS duplicate_edges;
+DROP TABLE IF EXISTS notification_actions;
+DROP TABLE IF EXISTS notification_categories;
+DROP TABLE IF EXISTS notification_embeddings;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS sources;
+DELETE FROM schema_migrations WHERE version = 1;
+COMMIT;
