@@ -33,6 +33,7 @@ Modern digital communication forces us to constantly context-switch across dozen
 - 💬 **Suggested Quick Drafts:** AI drafts one-click response suggestions for actionable notifications.
 - 📱 **Cross-Platform Responsive (Desktop & Android):** Modern React SPA with PWA support, optimized for desktop monitors, Android mobile browsers, and native WebViews.
 - ⚡ **Debounced Batch Processing:** LLM inference is triggered conservatively in batches rather than on every raw event, maximizing battery life and reducing CPU/GPU overhead.
+- 🧩 **Capability-Restricted Plugins:** Optional Rust/Wasmtime plugins can transform notifications through a bounded JSON ABI with no filesystem or network access and a 50 ms call limit. See [`docs/wasm-plugins.md`](docs/wasm-plugins.md).
 
 ---
 
