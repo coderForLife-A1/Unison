@@ -22,5 +22,8 @@ streamlit>=1.38.0
 # Async support
 aiofiles>=24.0.0
 
+# Linear-time regular expressions for untrusted notification text
+google-re2>=1.1.20240601
+
 # Benchmark CPU/RAM measurements
 psutil>=6.0.0

@@ -7,7 +7,6 @@ cannot select an executable, alter shell syntax, or become a shell command.
 from __future__ import annotations
 
 import json
-import re
 import subprocess
 import unicodedata
 import webbrowser
@@ -16,25 +15,36 @@ from enum import Enum
 from typing import Callable, Mapping, Sequence
 from urllib.parse import urlparse
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from src.engine.safe_regex import SafePattern
 
 MAX_BODY_LENGTH = 16_384
+MAX_SANITIZED_BODY_BYTES = 2 * 1024
 MAX_FIELD_LENGTH = 512
 ALLOWED_URL_SCHEMES = frozenset({"http", "https"})
-CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
-OTP_PATTERN = re.compile(
+CONTROL_CHARS = SafePattern(
+    r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", max_input_bytes=MAX_BODY_LENGTH
+)
+ANSI_SEQUENCES = SafePattern(
+    r"\x1b(?:\][^\x07]*(?:\x07|\x1b\\)|[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])",
+    max_input_bytes=MAX_BODY_LENGTH,
+)
+OTP_PATTERN = SafePattern(
     r"(?i)\b(?:otp|one[- ]time password|verification code|security code)"
     r"\D{0,24}([0-9](?:[\s-]?[0-9]){3,11})\b"
 )
-URL_PATTERN = re.compile(r"(?i)\bhttps?://[^\s<>\x00-\x1f]+")
-MEETING_PATTERN = re.compile(
+URL_PATTERN = SafePattern(r"(?i)\bhttps?://[^\s<>\x00-\x1f]+")
+MEETING_PATTERN = SafePattern(
     r"(?i)\b(?:meeting|conference|event)\s*(?:id|code)?\s*[:#-]?\s*"
     r"([A-Z0-9][A-Z0-9._-]{3,63})\b"
 )
-PR_PATTERN = re.compile(
+PR_PATTERN = SafePattern(
     r"(?i)(?:pull request|pr)\s*#?\s*(\d{1,9})\b"
     r"|https?://(?:www\.)?github\.com/[^/\s]+/[^/\s]+/pull/(\d{1,9})(?:[/?#\s]|$)"
 )
+OTP_SEPARATOR_PATTERN = SafePattern(r"[\s-]")
+COMMAND_INJECTION_CHARS = frozenset(";&|`$><")
 
 
 class IntentKind(str, Enum):
@@ -75,6 +85,14 @@ class IntentPayload(BaseModel):
             raise ValueError("URL contains control characters")
         return value
 
+    @model_validator(mode="after")
+    def reject_command_syntax(self) -> "IntentPayload":
+        if self.kind is not IntentKind.DEEP_LINK and any(
+            character in COMMAND_INJECTION_CHARS for character in self.value
+        ):
+            raise ValueError("intent value contains command syntax")
+        return self
+
 
 @dataclass(frozen=True)
 class NotificationIntent:
@@ -85,13 +103,17 @@ class NotificationIntent:
 
 
 def sanitize_body(body: str) -> str:
-    """Normalize text and reject oversized/control-heavy notification bodies."""
+    """Normalize text and cap the expensive parser input at 2 KiB."""
     if not isinstance(body, str):
         raise TypeError("notification body must be a string")
     normalized = unicodedata.normalize("NFKC", body).replace("\u2028", " ").replace("\u2029", " ")
     if len(normalized) > MAX_BODY_LENGTH:
         raise ValueError(f"notification body exceeds {MAX_BODY_LENGTH} characters")
-    cleaned = CONTROL_CHARS.sub("", normalized)
+    without_ansi = ANSI_SEQUENCES.sub("", normalized)
+    cleaned = CONTROL_CHARS.sub("", without_ansi)
+    encoded = cleaned.encode("utf-8")
+    if len(encoded) > MAX_SANITIZED_BODY_BYTES:
+        cleaned = encoded[:MAX_SANITIZED_BODY_BYTES].decode("utf-8", errors="ignore")
     return cleaned.strip()
 
 
@@ -111,7 +133,7 @@ class IntentExtractor:
 
         otp_match = OTP_PATTERN.search(body)
         if otp_match:
-            otp = re.sub(r"[\s-]", "", otp_match.group(1))
+            otp = OTP_SEPARATOR_PATTERN.sub("", otp_match.group(1))
             if 4 <= len(otp) <= 12:
                 results.append(IntentPayload(
                     kind=IntentKind.OTP, value=otp, source_text_hash=text_hash,
@@ -202,4 +224,3 @@ class SafeEventDispatcher:
             timeout=timeout_seconds,
         )
         return completed.returncode == 0
-

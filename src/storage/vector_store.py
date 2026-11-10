@@ -72,6 +72,9 @@ class VectorStore:
         """
         if self._table is not None:
             return self._table
+        self._try_open_table()
+        if self._table is not None:
+            return self._table
 
         schema = pa.schema(
             [
@@ -195,3 +198,7 @@ class VectorStore:
         # Sort by ISO timestamp descending and take the top N.
         df = df.sort_values("timestamp", ascending=False).head(n)
         return df.drop(columns=["vector"], errors="ignore").to_dict(orient="records")
+
+    def clear_nonessential_cache(self) -> None:
+        """Release transient table handles while retaining persistent vectors."""
+        self._table = None

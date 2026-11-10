@@ -219,3 +219,10 @@ class Deduplicator:
         )
 
         return batches
+
+    def clear_nonessential_caches(self) -> None:
+        """Release model/search caches without deleting persistent vectors."""
+        self._embedder.clear_nonessential_cache()
+        clear_store_cache = getattr(self._store, "clear_nonessential_cache", None)
+        if clear_store_cache is not None:
+            clear_store_cache()
