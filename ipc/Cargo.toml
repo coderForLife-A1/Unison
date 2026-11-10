@@ -1,0 +1,15 @@
+[package]
+name = "unison-ipc"
+version = "0.1.0"
+edition = "2021"
+description = "Local JSON-RPC IPC protocol and transports for Unison"
+license = "MIT"
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["io-util", "net", "rt", "sync"] }
+
+[target.'cfg(windows)'.dependencies]
+tokio = { version = "1", features = ["net", "io-util"] }
