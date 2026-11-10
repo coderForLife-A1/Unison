@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 
 from src.config import settings
 from src.engine.llm_client import OllamaClient, OllamaOfflineError
+from src.engine.system_monitor import ResourcePolicy, TriageTier
 from src.models.schemas import NotificationBatch, UnisonSummary
 
 logger = logging.getLogger(__name__)
@@ -40,8 +41,13 @@ Guidelines:
 class UnisonEngine:
     """Processes notification batches through Ollama with Instructor structured parsing."""
 
-    def __init__(self, llm_client: Optional[OllamaClient] = None) -> None:
+    def __init__(
+        self,
+        llm_client: Optional[OllamaClient] = None,
+        resource_policy: ResourcePolicy | None = None,
+    ) -> None:
         self.llm_client = llm_client or OllamaClient()
+        self.resource_policy = resource_policy or ResourcePolicy()
         self._instructor_client = None
 
     def _get_client(self):
@@ -74,6 +80,9 @@ class UnisonEngine:
         UnisonSummary
             Strictly validated summary model.
         """
+        if self.resource_policy.refresh() is TriageTier.TIER_1:
+            return self._deterministic_summary(batch)
+
         if not self.llm_client.is_available():
             raise OllamaOfflineError(self.llm_client.host)
 
@@ -112,6 +121,27 @@ class UnisonEngine:
                 batch_id=batch.batch_id,
             )
 
+    @staticmethod
+    def _deterministic_summary(batch: NotificationBatch) -> UnisonSummary:
+        """Produce a cheap rule-based result while resources are constrained."""
+        content = batch.representative_content.lower()
+        if any(token in content for token in ("otp", "verification code", "security code")):
+            priority, category, action = "High", "OTP", True
+        elif any(token in content for token in ("urgent", "deadline", "critical")):
+            priority, category, action = "High", "System", True
+        elif any(token in content for token in ("unsubscribe", "sale", "promotion")):
+            priority, category, action = "Noise", "Promo", False
+        else:
+            priority, category, action = "Low", "General", False
+        return UnisonSummary(
+            source=f"{batch.source} - {batch.primary_sender}",
+            priority=priority,
+            category=category,
+            summary=f"Received {len(batch.notifications)} notification(s).",
+            action_required=action,
+            batch_id=batch.batch_id,
+        )
+
     async def unison_batches(self, batches: list[NotificationBatch]) -> list[UnisonSummary]:
         """Unison multiple batches sequentially to minimize resource overhead.
 
@@ -130,4 +160,3 @@ class UnisonEngine:
             summary = await self.unison_batch(batch)
             summaries.append(summary)
         return summaries
-

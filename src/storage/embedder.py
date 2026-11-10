@@ -93,3 +93,8 @@ class EmbeddingService:
         model = self._ensure_model()
         embeddings = list(model.embed(texts))
         return [e.tolist() for e in embeddings]
+
+    def clear_nonessential_cache(self) -> None:
+        """Release the in-memory embedding model; persistent data is untouched."""
+        self._model = None
+        logger.info("Released non-essential embedding model cache.")

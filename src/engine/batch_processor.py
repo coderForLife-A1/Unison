@@ -14,7 +14,8 @@ from typing import Optional
 
 from src.config import settings
 from src.engine.unison import UnisonEngine
-from src.models.schemas import IngestedNotification, UnisonSummary
+from src.engine.system_monitor import TriageTier
+from src.models.schemas import IngestedNotification, NotificationBatch, UnisonSummary
 from src.storage.deduplicator import Deduplicator
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,9 @@ class BatchProcessor:
         self._buffer: list[IngestedNotification] = []
         self._last_flush: datetime = datetime.now()
         self._lock = asyncio.Lock()
+        self.unison_engine.resource_policy.add_cache_flusher(
+            self.deduplicator.clear_nonessential_caches
+        )
 
     def add(self, notification: IngestedNotification) -> None:
         """Add a single notification to the processing buffer."""
@@ -71,8 +75,18 @@ class BatchProcessor:
 
             logger.info("Flushing %d notifications for batch unison...", len(items_to_process))
 
-            # 1. Deduplicate
-            batches = self.deduplicator.process(items_to_process)
+            # 1. Skip embedding/vector work under power or memory pressure.
+            if self.unison_engine.resource_policy.refresh() is TriageTier.TIER_1:
+                batches = [
+                    NotificationBatch(
+                        notifications=items_to_process,
+                        representative_content=" ".join(
+                            item.content for item in items_to_process
+                        ),
+                    )
+                ]
+            else:
+                batches = self.deduplicator.process(items_to_process)
             logger.info("Grouped into %d distinct batches.", len(batches))
 
             # 2. Unison sequentially
@@ -83,4 +97,3 @@ class BatchProcessor:
     def buffer_size(self) -> int:
         """Return the count of currently buffered items."""
         return len(self._buffer)
-
