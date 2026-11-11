@@ -8,3 +8,4 @@ anyhow = "1"
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }
 unison-ipc = { path = "../ipc" }
+unison-notification-bridge = { path = "../bridge" }

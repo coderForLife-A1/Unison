@@ -4,12 +4,13 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use tokio::{
     io::{BufReader, BufWriter},
-    sync::broadcast,
+    sync::{broadcast, mpsc},
 };
 use unison_ipc::{
     default_endpoint, transport, validate_request, MetricsSnapshot, NotificationEvent, RpcError,
     RpcEvent, RpcRequest, RpcResponse, SubscribeParams, PROTOCOL_VERSION,
 };
+use unison_notification_bridge::NotificationBridge;
 
 #[derive(Clone, Debug, Deserialize, Serialize, Default)]
 struct RequestParams {
@@ -22,6 +23,27 @@ async fn main() -> Result<()> {
     let endpoint = default_endpoint();
     let (events, _) = broadcast::channel::<NotificationEvent>(256);
     let events = Arc::new(events);
+    let (bridge_sender, mut bridge_receiver) = mpsc::channel(256);
+    tokio::spawn(async move {
+        if let Err(error) = NotificationBridge::run(bridge_sender).await {
+            eprintln!("notification bridge stopped: {error:#}");
+        }
+    });
+    let event_broadcast = Arc::clone(&events);
+    tokio::spawn(async move {
+        let mut sequence = 0;
+        while let Some(event) = bridge_receiver.recv().await {
+            sequence += 1;
+            let _ = event_broadcast.send(NotificationEvent {
+                sequence,
+                received_at_ms: event.received_at_ms,
+                source: event.app_id,
+                sender: event.title,
+                body_preview: event.body,
+                priority: "Unknown".to_owned(),
+            });
+        }
+    });
 
     #[cfg(unix)]
     {
