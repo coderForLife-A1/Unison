@@ -1,0 +1,37 @@
+
+thread 'main' (18204) panicked at /rustc-dev/88d9e12ae178fab0fb5cc050a94da85685d449ea/compiler\rustc_driver_impl\src\lib.rs:1660:6:
+Unable to install ctrlc handler: System(Os { code: 1455, kind: Uncategorized, message: "The paging file is too small for this operation to complete." })
+stack backtrace:
+   0:     0x7ff852fe19b9 - <unknown>
+   1:     0x7ff85300a9f1 - <unknown>
+   2:     0x7ff852ff1874 - <std[8a6d8cd86c7d29b2]::fs::ReadDir as core[725674be3c713151]::iter::traits::iterator::Iterator>::next
+   3:     0x7ff852fb8255 - std[8a6d8cd86c7d29b2]::sys::backtrace::__rust_end_short_backtrace::<std[8a6d8cd86c7d29b2]::panicking::begin_panic<&str>::{closure#0}, !>
+   4:     0x7ff852fd3bb8 - std[8a6d8cd86c7d29b2]::panicking::default_hook
+   5:     0x7fff8abe673b - <unknown>
+   6:     0x7ff852fd3fd4 - std[8a6d8cd86c7d29b2]::panicking::panic_with_hook
+   7:     0x7ff852fb832e - std[8a6d8cd86c7d29b2]::sys::backtrace::__rust_end_short_backtrace::<std[8a6d8cd86c7d29b2]::panicking::begin_panic<&str>::{closure#0}, !>
+   8:     0x7ff852fb57af - std[8a6d8cd86c7d29b2]::sys::backtrace::__rust_end_short_backtrace::<std[8a6d8cd86c7d29b2]::panicking::begin_panic<&str>::{closure#0}, !>
+   9:     0x7ff852fb8e7e - __rustc[4b1ee1ef74718a7b]::rust_begin_unwind
+  10:     0x7ff85302e37d - core[725674be3c713151]::panicking::panic_fmt
+  11:     0x7ff85302e017 - core[725674be3c713151]::result::unwrap_failed
+  12:     0x7fff86761207 - <unknown>
+  13:     0x7fff867625d4 - <unknown>
+  14:     0x7ff66c1f1006 - <unknown>
+  15:     0x7ff852fd1e70 - std[8a6d8cd86c7d29b2]::rt::lang_start_internal
+  16:     0x7ff66c1f105a - <unknown>
+  17:     0x7ff66c1f126f - <unknown>
+  18:     0x7ff88ad7dda7 - <unknown>
+  19:     0x7ff88cb1ee4c - <unknown>
+
+error: the compiler unexpectedly panicked. This is a bug
+
+note: we would appreciate a bug report: https://github.com/rust-lang/rust/issues/new?labels=C-bug%2C+I-ICE%2C+T-compiler&template=ice.md
+
+note: rustc 1.98.0 (88d9e12ae 2026-08-18) running on x86_64-pc-windows-msvc
+
+note: compiler flags: --crate-type lib -C embed-bitcode=no -C debuginfo=2
+
+note: some of the compiler flags provided by cargo are hidden
+
+query stack during panic:
+end of query stack

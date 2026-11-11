@@ -1,0 +1,19 @@
+memory allocation of 147472 bytes failed
+stack backtrace:
+   0:     0x7ff852fe19b9 - <unknown>
+   1:     0x7ff85300a9f1 - <unknown>
+   2:     0x7ff852ff1874 - <unknown>
+   3:     0x7ff852fd393c - <unknown>
+   4:     0x7ff852fb815c - <unknown>
+   5:     0x7ff852fb578f - <unknown>
+   6:     0x7ff852fd39db - <unknown>
+   7:     0x7ff852fb8f98 - <unknown>
+   8:     0x7ff85302d9d9 - <unknown>
+   9:     0x7fff8d62fe1e - <unknown>
+  10:     0x7fff891da504 - <unknown>
+  11:     0x7fff867502af - <unknown>
+  12:     0x7fff86748a05 - <unknown>
+  13:     0x7fff86754a97 - <unknown>
+  14:     0x7ff852fde6a3 - <unknown>
+  15:     0x7ff88ad7dda7 - BaseThreadInitThunk
+  16:     0x7ff88cb1ee4c - RtlUserThreadStart

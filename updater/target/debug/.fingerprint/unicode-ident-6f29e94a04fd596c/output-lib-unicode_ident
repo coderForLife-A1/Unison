@@ -1,0 +1,67 @@
+memory allocation of 64512 bytes failed
+stack backtrace:
+   0:     0x7ff852fe19b9 - <<std[8a6d8cd86c7d29b2]::sys::backtrace::BacktraceLock>::print::DisplayBacktrace as core[725674be3c713151]::fmt::Display>::fmt
+   1:     0x7ff85300a9f1 - core[725674be3c713151]::fmt::write
+   2:     0x7ff852ff1874 - <std[8a6d8cd86c7d29b2]::fs::ReadDir as core[725674be3c713151]::iter::traits::iterator::Iterator>::next
+   3:     0x7ff852fd393c - std[8a6d8cd86c7d29b2]::alloc::default_alloc_error_hook
+   4:     0x7ff852fb815c - std[8a6d8cd86c7d29b2]::sys::backtrace::__rust_end_short_backtrace::<std[8a6d8cd86c7d29b2]::panicking::begin_panic<&str>::{closure#0}, !>
+   5:     0x7ff852fb578f - std[8a6d8cd86c7d29b2]::sys::backtrace::__rust_end_short_backtrace::<std[8a6d8cd86c7d29b2]::panicking::begin_panic<&str>::{closure#0}, !>
+   6:     0x7ff852fd39db - std[8a6d8cd86c7d29b2]::alloc::rust_oom
+   7:     0x7ff852fb8f98 - __rustc[4b1ee1ef74718a7b]::__rust_alloc_error_handler
+   8:     0x7ff85302d9d9 - alloc[8fb160f29d24b0e9]::alloc::handle_alloc_error
+   9:     0x7ff85302d9f6 - alloc[8fb160f29d24b0e9]::raw_vec::handle_error
+  10:     0x7fff89532840 - <unknown>
+  11:     0x7fff895562b7 - <unknown>
+  12:     0x7fff89570e82 - <unknown>
+  13:     0x7fff89554ef8 - <unknown>
+  14:     0x7fff8950fef8 - <unknown>
+  15:     0x7fff895251c0 - <unknown>
+  16:     0x7fff8a2663eb - <unknown>
+  17:     0x7fff8a165ddd - <unknown>
+  18:     0x7fff8a266468 - <unknown>
+  19:     0x7fff89aaa52a - <unknown>
+  20:     0x7fff8a262bfb - <unknown>
+  21:     0x7fff8a15abfb - <unknown>
+  22:     0x7fff8a262c6b - <unknown>
+  23:     0x7fff89a8f80a - <unknown>
+  24:     0x7fff898960d5 - <unknown>
+  25:     0x7fff8a27e15b - <unknown>
+  26:     0x7fff8a165ddd - <unknown>
+  27:     0x7fff8a27e1d8 - <unknown>
+  28:     0x7fff8988bd53 - <unknown>
+  29:     0x7fff8a26d570 - <unknown>
+  30:     0x7fff8a1963e7 - <unknown>
+  31:     0x7fff8a26d5fe - <unknown>
+  32:     0x7fff8987f610 - <unknown>
+  33:     0x7fff8a267069 - <unknown>
+  34:     0x7fff8a157270 - <unknown>
+  35:     0x7fff8a2670ff - <unknown>
+  36:     0x7fff89b0c870 - <unknown>
+  37:     0x7fff8a266e1b - <unknown>
+  38:     0x7fff8a165ddd - <unknown>
+  39:     0x7fff8a266e9f - <unknown>
+  40:     0x7fff89893f62 - <unknown>
+  41:     0x7fff8a2799db - <unknown>
+  42:     0x7fff8a165ddd - <unknown>
+  43:     0x7fff8a279a5f - <unknown>
+  44:     0x7fff8987a4b0 - <unknown>
+  45:     0x7fff8a266f30 - <unknown>
+  46:     0x7fff8a19832c - <unknown>
+  47:     0x7fff8a266fd1 - <unknown>
+  48:     0x7fff89e0b0a4 - <unknown>
+  49:     0x7fff89cd20d4 - <unknown>
+  50:     0x7fff88c8bc01 - <unknown>
+  51:     0x7fff88ec4d48 - <unknown>
+  52:     0x7fff8a16c5c1 - <unknown>
+  53:     0x7fff88ec4df1 - <unknown>
+  54:     0x7fff896c625c - <unknown>
+  55:     0x7fff893c82f0 - <unknown>
+  56:     0x7fff88ed2fea - <unknown>
+  57:     0x7fff88db81a3 - <unknown>
+  58:     0x7fff88ed3050 - <unknown>
+  59:     0x7fff867509e7 - <unknown>
+  60:     0x7fff86748a05 - <unknown>
+  61:     0x7fff86754a97 - <unknown>
+  62:     0x7ff852fde6a3 - std[8a6d8cd86c7d29b2]::sys::io::error::windows::errno
+  63:     0x7ff88ad7dda7 - BaseThreadInitThunk
+  64:     0x7ff88cb1ee4c - RtlUserThreadStart
