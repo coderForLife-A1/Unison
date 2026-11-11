@@ -1,0 +1,23 @@
+[package]
+name = "unison-notification-bridge"
+version = "0.1.0"
+edition = "2021"
+description = "Cross-platform notification listener bridge for Unison"
+license = "MIT"
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }
+
+[target.'cfg(unix)'.dependencies]
+zbus = { version = "5", default-features = false, features = ["tokio"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = [
+    "Foundation",
+    "Foundation_Collections",
+    "System",
+    "UI_Notifications",
+    "UI_Notifications_Management",
+] }

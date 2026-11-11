@@ -1,0 +1,26 @@
+[package]
+name = "unison-updater"
+version = "0.1.0"
+edition = "2021"
+description = "Signed, rollback-safe updater for Unison"
+license = "MIT"
+
+[dependencies]
+anyhow = "1"
+base64 = "0.22"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+tokio = { version = "1", features = ["fs", "io-util", "process", "time"] }
+futures-util = "0.3"
+url = "2"
+hex = "0.4"
+semver = "1"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_Storage_FileSystem"] }
+
+[dev-dependencies]
+tempfile = "3"

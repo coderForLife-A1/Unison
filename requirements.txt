@@ -27,3 +27,6 @@ google-re2>=1.1.20240601
 
 # Benchmark CPU/RAM measurements
 psutil>=6.0.0
+
+# Authenticated encryption for local crash diagnostics
+cryptography>=42.0.0

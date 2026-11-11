@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import io
+from pathlib import Path
 import sys
 
 # Ensure UTF-8 output on Windows terminal
@@ -94,6 +95,9 @@ async def run_cli_cycle() -> None:
 
 def main() -> None:
     """Parse arguments and run the selected mode."""
+    from src.diagnostics import CrashDiagnostics
+
+    CrashDiagnostics(Path(".unison") / "crashes").install_exception_hooks()
     parser = argparse.ArgumentParser(
         prog="unison",
         description="🦥 Unison — Slow and Steady Notification Intelligence",
