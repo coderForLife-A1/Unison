@@ -103,6 +103,12 @@ Supported methods:
 - `replace_rules`: optimistic concurrency using `expected_version`.
 - `shutdown`: only for an explicitly authorized local operator.
 
+The `benchmark.ingest` method is test-only. It is accepted only when the
+daemon is started with `UNISON_BENCHMARK=1`; it publishes a bounded synthetic
+event without replacing the production OS ingestion path. The repository
+stress harness uses this method to exercise concurrent IPC and event
+broadcasting.
+
 All strings and arrays are bounded before parsing into application state.
 Notification bodies are previewed/redacted by the daemon; the TUI does not
 receive credentials or unrestricted raw payloads.

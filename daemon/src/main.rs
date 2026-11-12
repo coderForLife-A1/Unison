@@ -16,6 +16,16 @@ use unison_notification_bridge::NotificationBridge;
 struct RequestParams {
     #[serde(flatten)]
     subscribe: Option<SubscribeParams>,
+    notification: Option<BenchmarkNotification>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+struct BenchmarkNotification {
+    id: String,
+    source: String,
+    sender: String,
+    body: String,
+    received_at_ms: i64,
 }
 
 #[tokio::main]
@@ -147,6 +157,58 @@ where
                     unison_ipc::write_frame(&mut writer, &notification).await?;
                 }
                 return Ok(());
+            }
+            "benchmark.ingest" => {
+                if std::env::var_os("UNISON_BENCHMARK").as_deref() != Some(std::ffi::OsStr::new("1")) {
+                    unison_ipc::write_frame(
+                        &mut writer,
+                        &RpcResponse::<()>::error(
+                            request.id,
+                            -32601,
+                            "benchmark ingestion is disabled",
+                        ),
+                    )
+                    .await?;
+                    continue;
+                }
+                let Some(notification) = request.params.notification else {
+                    unison_ipc::write_frame(
+                        &mut writer,
+                        &RpcResponse::<()>::error(
+                            request.id,
+                            -32602,
+                            "benchmark.ingest requires notification params",
+                        ),
+                    )
+                    .await?;
+                    continue;
+                };
+                if notification.id.len() > 128
+                    || notification.source.len() > 64
+                    || notification.sender.len() > 512
+                    || notification.body.len() > 256 * 1024
+                {
+                    unison_ipc::write_frame(
+                        &mut writer,
+                        &RpcResponse::<()>::error(request.id, -32602, "notification is too large"),
+                    )
+                    .await?;
+                    continue;
+                }
+                let event = NotificationEvent {
+                    sequence: 0,
+                    received_at_ms: notification.received_at_ms,
+                    source: notification.source,
+                    sender: notification.sender,
+                    body_preview: notification.body,
+                    priority: "Unknown".to_owned(),
+                };
+                let _ = events.send(event);
+                unison_ipc::write_frame(
+                    &mut writer,
+                    &RpcResponse::success(request.id, true),
+                )
+                .await?;
             }
             "get_snapshot" => {
                 unison_ipc::write_frame(
